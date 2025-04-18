@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Funcionários Cadastrados</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">Locadora</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Início</a></li>
+          <li class="nav-item"><a class="nav-link" href="/funcionarios/cadastrar/">Cadastrar Funcionário</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <div class="container py-5">
+    <h4 class="text-center mb-4">Funcionários Cadastrados</h4>
+
+    <div class="card shadow-sm p-4">
+
+      {% if funcionarios %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle text-center">
+            <thead class="table-primary">
+              <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Cargo</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for funcionario in funcionarios %}
+              <tr>
+                <td>{{ funcionario.nome }}</td>
+                <td>{{ funcionario.cpf }}</td>
+                <td>{{ funcionario.cargo }}</td>
+                <td>{{ funcionario.email }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert alert-warning text-center mb-0" role="alert">
+          Nenhum funcionário cadastrado até o momento.
+        </div>
+      {% endif %}
+
+      <!-- Botão -->
+      <div class="text-end mt-4">
+        <a href="/funcionarios/cadastrar/" class="btn btn-success">
+          <i class="bi bi-person-plus-fill me-1"></i> Novo Funcionário
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (opcional) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap Icons (opcional para ícones) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+</body>
+</html>
