@@ -15,14 +15,20 @@ def reservar_veiculo(request, veiculo_id):
             reserva = form.save(commit=False)
             reserva.veiculo = veiculo
             reserva.funcionario = Funcionario.objects.first()  # substituir por funcionário logado futuramente
+
+            # Cálculo seguro de dias e valor total
             dias = (reserva.data_fim - reserva.data_inicio).days
+            if dias <= 0:
+                dias = 1
             reserva.valor_total = dias * veiculo.preco_locacao
+
             reserva.save()
 
             veiculo.status_disponibilidade = False
             veiculo.save()
 
-            return redirect('home')
+            messages.success(request, "Reserva criada com sucesso.")
+            return redirect('listar_reservas')
     else:
         form = ReservaForm(veiculo=veiculo)
 
@@ -96,3 +102,36 @@ def registrar_devolucao_veiculo(request, reserva_id):
         'reserva': reserva,
         'form': form
     })
+
+def entrega_quarta(request):
+    reservas = Reserva.objects.select_related('cliente', 'veiculo', 'funcionario').all()
+    return render(request, 'reservas/entrega_quarta.html', {'reservas': reservas})
+
+from .forms import ReservaForm
+from django.contrib import messages
+
+def editar_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+
+    if request.method == 'POST':
+        form = ReservaForm(request.POST, instance=reserva, veiculo=reserva.veiculo)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            dias = (reserva.data_fim - reserva.data_inicio).days
+            reserva.valor_total = dias * reserva.veiculo.preco_locacao
+            reserva.save()
+            messages.success(request, 'Reserva atualizada com sucesso.')
+            return redirect('entrega_quarta')
+    else:
+        form = ReservaForm(instance=reserva, veiculo=reserva.veiculo)
+
+    return render(request, 'reservas/editar_reserva.html', {'form': form, 'reserva': reserva})
+
+
+def excluir_reserva(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    if request.method == 'POST':
+        reserva.delete()
+        messages.success(request, 'Reserva excluída com sucesso.')
+        return redirect('entrega_quarta')
+    return render(request, 'reservas/excluir_reserva.html', {'reserva': reserva})

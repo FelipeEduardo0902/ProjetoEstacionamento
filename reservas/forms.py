@@ -16,16 +16,31 @@ class ReservaForm(forms.ModelForm):
         self.veiculo = kwargs.pop('veiculo', None)
         super().__init__(*args, **kwargs)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        data_inicio = cleaned_data.get('data_inicio')
-        data_fim = cleaned_data.get('data_fim')
 
-        if data_inicio and data_fim and data_fim < data_inicio:
+
+def clean(self):
+    cleaned_data = super().clean()
+    data_inicio = cleaned_data.get('data_inicio')
+    data_fim = cleaned_data.get('data_fim')
+
+    if data_inicio and data_fim:
+        if data_fim < data_inicio:
             raise ValidationError("A data de devolução não pode ser anterior à data de retirada.")
+        
+        dias = (data_fim - data_inicio).days
+        if dias <= 0:
+            dias = 1  # para garantir pelo menos 1 dia de cobrança
 
-        if self.veiculo and not self.veiculo.status_disponibilidade:
-            raise ValidationError(f"O veículo '{self.veiculo}' está indisponível.")
+        if self.veiculo:
+            if not self.veiculo.status_disponibilidade:
+                raise ValidationError(f"O veículo '{self.veiculo}' está indisponível.")
+            valor_total = dias * self.veiculo.preco_locacao
+            cleaned_data['valor_total'] = valor_total
+        else:
+            raise ValidationError("Veículo não informado para calcular o valor total.")
+
+    return cleaned_data
+
 
 
 class RetiradaVeiculoForm(forms.ModelForm):

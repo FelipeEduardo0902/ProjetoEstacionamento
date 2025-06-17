@@ -21,6 +21,26 @@
       font-size: 3rem;
       margin-bottom: 10px;
     }
+
+    /* Botão piscante estilo natalino */
+    .blinking-button {
+      font-size: 1.5rem;
+      padding: 20px 40px;
+      animation: blink 1s infinite;
+      border-radius: 50px;
+      background: linear-gradient(45deg, red, green, gold);
+      color: white;
+      border: none;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    @keyframes blink {
+      0%   { opacity: 1; filter: hue-rotate(0deg); }
+      25%  { opacity: 0.8; filter: hue-rotate(60deg); }
+      50%  { opacity: 1; filter: hue-rotate(120deg); }
+      75%  { opacity: 0.8; filter: hue-rotate(180deg); }
+      100% { opacity: 1; filter: hue-rotate(360deg); }
+    }
   </style>
 </head>
 <body class="bg-light">
@@ -31,6 +51,13 @@
       <a class="navbar-brand" href="/">Locadora</a>
     </div>
   </nav>
+
+  <!-- Botão destaque Entrega de Quarta -->
+  <div class="text-center my-4">
+    <a href="/reservas/entrega-quarta/" class="btn btn-lg fw-bold blinking-button shadow">
+      🎄 Entrega Especial de Quarta 🎄
+    </a>
+  </div>
 
   <div class="container py-4">
     <h4 class="text-center">Painel Principal</h4>

@@ -3,6 +3,10 @@ from .forms import FuncionarioForm
 from .models import Funcionario
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import render
+
+
 
 def cadastrar_funcionario(request):
     if request.method == 'POST':
@@ -32,3 +36,7 @@ def login_view(request):
             messages.error(request, 'Usuário ou senha inválidos.')
 
     return render(request, 'usuarios/login.html')
+
+def entrega_quarta(request):
+    usuarios = User.objects.all()
+    return render(request, 'usuarios/entrega_quarta.html', {'usuarios': usuarios})
