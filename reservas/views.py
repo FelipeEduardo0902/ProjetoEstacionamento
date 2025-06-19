@@ -40,9 +40,9 @@ def reservar_veiculo(request, veiculo_id):
 
 # View para listar reservas
 def listar_reservas(request):
-    reservas = Reserva.objects.select_related('cliente', 'veiculo').all()
+    ordenar = request.GET.get('ordenar', 'data_inicio')  # ou qualquer campo válido
+    reservas = Reserva.objects.select_related('cliente', 'veiculo').order_by(ordenar)
     return render(request, 'reservas/listar.html', {'reservas': reservas})
-
 
 # View para registrar retirada
 def registrar_retirada(request, reserva_id):
@@ -104,11 +104,32 @@ def registrar_devolucao_veiculo(request, reserva_id):
     })
 
 def entrega_quarta(request):
-    reservas = Reserva.objects.select_related('cliente', 'veiculo', 'funcionario').all()
-    return render(request, 'reservas/entrega_quarta.html', {'reservas': reservas})
+    if request.method == 'POST':
+        cliente_nome = request.POST.get('cliente_nome', '').strip()
+        return redirect(f"{reverse('entrega_quarta')}?cliente_nome={cliente_nome}&ordenar=data_inicio")
 
-from .forms import ReservaForm
-from django.contrib import messages
+    ordenar = request.GET.get('ordenar', 'data_inicio')
+    cliente_nome = request.GET.get('cliente_nome', '').strip()
+
+    queryset = Reserva.objects.select_related('cliente', 'veiculo', 'funcionario')
+
+    if cliente_nome:
+        queryset = queryset.filter(cliente__nome__icontains=cliente_nome)
+
+    campos_validos = ['data_inicio', 'data_fim', 'valor_total', 'cliente__nome', 'cliente__documento',
+                      'veiculo__modelo', 'veiculo__placa', 'funcionario__nome', 'status']
+
+    ordenar_base = ordenar.lstrip('-')
+    if ordenar_base not in campos_validos:
+        ordenar = 'data_inicio'
+
+    reservas = queryset.order_by(ordenar)
+
+    return render(request, 'reservas/entrega_quarta.html', {
+        'reservas': reservas,
+        'ordenar': ordenar,
+        'cliente_nome': cliente_nome,
+    })
 
 def editar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
