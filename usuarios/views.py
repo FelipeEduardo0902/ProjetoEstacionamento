@@ -12,13 +12,31 @@ def cadastrar_funcionario(request):
     if request.method == 'POST':
         form = FuncionarioForm(request.POST)
         if form.is_valid():
-            form.save()
+            funcionario = form.save(commit=False)
+
+            # Define o username como o e-mail do funcionário
+            username = funcionario.email
+
+            # Verifica se já existe usuário com o mesmo e-mail (username)
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Já existe um usuário com esse e-mail.')
+                return render(request, 'usuarios/cadastrar_funcionario.html', {'form': form})
+
+            # Cria o usuário corretamente usando create_user
+            user = User.objects.create_user(
+                username=username,
+                password=form.cleaned_data['senha']
+            )
+
+            funcionario.user = user
+            funcionario.save()
+
+            messages.success(request, 'Funcionário e usuário criados com sucesso!')
             return redirect('home')
     else:
         form = FuncionarioForm()
+
     return render(request, 'usuarios/cadastrar_funcionario.html', {'form': form})
-
-
 @login_required
 def listar_funcionarios(request):
     funcionarios = Funcionario.objects.all()
