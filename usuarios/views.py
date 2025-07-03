@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect
 from .forms import FuncionarioForm
 from .models import Funcionario
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
-
+@login_required
 def cadastrar_funcionario(request):
     if request.method == 'POST':
         form = FuncionarioForm(request.POST)
@@ -18,6 +18,8 @@ def cadastrar_funcionario(request):
         form = FuncionarioForm()
     return render(request, 'usuarios/cadastrar_funcionario.html', {'form': form})
 
+
+@login_required
 def listar_funcionarios(request):
     funcionarios = Funcionario.objects.all()
     return render(request, 'usuarios/listar_funcionarios.html', {'funcionarios': funcionarios})
@@ -37,6 +39,14 @@ def login_view(request):
 
     return render(request, 'usuarios/login.html')
 
+
+@login_required
 def entrega_quarta(request):
     usuarios = User.objects.all()
     return render(request, 'usuarios/entrega_quarta.html', {'usuarios': usuarios})
+
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('login')

@@ -45,6 +45,14 @@
               <p class="card-text"><strong>Placa:</strong> {{ veiculo.placa }}</p>
               <p class="card-text"><strong>Categoria:</strong> {{ veiculo.categoria }}</p>
               <p class="card-text"><strong>Valor diário:</strong> R$ {{ veiculo.preco_locacao }}</p>
+              <p class="card-text">
+                <strong>Status:</strong>
+                {% if veiculo.status_disponibilidade %}
+                  Disponível
+                {% else %}
+                  Indisponível
+                {% endif %}
+              </p>
             </div>
 
             <div class="card-footer text-center bg-white border-top-0">

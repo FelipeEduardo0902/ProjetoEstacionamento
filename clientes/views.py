@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from .models import Cliente
 from .forms import ClienteForm
+from django.contrib.auth.decorators import login_required
 
 # Cadastro
+@login_required
 def cadastrar_cliente(request):
     sucesso = False
     if request.method == 'POST':
@@ -17,6 +19,7 @@ def cadastrar_cliente(request):
     return render(request, 'clientes/cadastrar.html', {'form': form, 'sucesso': sucesso})
 
 # Listagem com busca
+@login_required
 def listar_clientes(request):
     busca = request.GET.get('busca', '')
     if busca:
@@ -28,6 +31,7 @@ def listar_clientes(request):
     return render(request, 'clientes/listar.html', {'clientes': clientes, 'busca': busca})
 
 # Edição
+@login_required
 def editar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     if request.method == 'POST':
@@ -40,6 +44,7 @@ def editar_cliente(request, cliente_id):
     return render(request, 'clientes/editar.html', {'form': form, 'cliente': cliente})
 
 # Exclusão
+@login_required
 def excluir_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     if request.method == 'POST':

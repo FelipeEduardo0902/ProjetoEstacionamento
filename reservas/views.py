@@ -4,8 +4,11 @@ from .forms import ReservaForm, RetiradaVeiculoForm, DevolucaoVeiculoForm
 from veiculos.models import Veiculo
 from usuarios.models import Funcionario
 from django.contrib import messages
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 # View para reservar veículo
+@login_required
 def reservar_veiculo(request, veiculo_id):
     veiculo = get_object_or_404(Veiculo, id=veiculo_id)
 
@@ -16,7 +19,6 @@ def reservar_veiculo(request, veiculo_id):
             reserva.veiculo = veiculo
             reserva.funcionario = Funcionario.objects.first()  # substituir por funcionário logado futuramente
 
-            # Cálculo seguro de dias e valor total
             dias = (reserva.data_fim - reserva.data_inicio).days
             if dias <= 0:
                 dias = 1
@@ -39,12 +41,14 @@ def reservar_veiculo(request, veiculo_id):
 
 
 # View para listar reservas
+@login_required
 def listar_reservas(request):
-    ordenar = request.GET.get('ordenar', 'data_inicio')  # ou qualquer campo válido
+    ordenar = request.GET.get('ordenar', 'data_inicio')
     reservas = Reserva.objects.select_related('cliente', 'veiculo').order_by(ordenar)
     return render(request, 'reservas/listar.html', {'reservas': reservas})
 
 # View para registrar retirada
+@login_required
 def registrar_retirada(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
     veiculo = reserva.veiculo
@@ -71,6 +75,7 @@ def registrar_retirada(request, reserva_id):
 
 
 # View para registrar devolução
+@login_required
 def registrar_devolucao_veiculo(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
 
@@ -79,7 +84,6 @@ def registrar_devolucao_veiculo(request, reserva_id):
         if form.is_valid():
             devolucao = form.save(commit=False)
 
-            # Validação: combustível final deve ser igual ou superior ao inicial
             nivel_inicial = reserva.nivel_combustivel_inicial
             nivel_final = devolucao.nivel_combustivel_final
             ordem_combustivel = ['muito_baixo', 'baixo', 'meio', 'cheio']
@@ -103,6 +107,8 @@ def registrar_devolucao_veiculo(request, reserva_id):
         'form': form
     })
 
+# Relatório e busca
+@login_required
 def entrega_quarta(request):
     if request.method == 'POST':
         cliente_nome = request.POST.get('cliente_nome', '').strip()
@@ -131,6 +137,8 @@ def entrega_quarta(request):
         'cliente_nome': cliente_nome,
     })
 
+# Editar reserva
+@login_required
 def editar_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
 
@@ -148,7 +156,8 @@ def editar_reserva(request, reserva_id):
 
     return render(request, 'reservas/editar_reserva.html', {'form': form, 'reserva': reserva})
 
-
+# Excluir reserva
+@login_required
 def excluir_reserva(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
     if request.method == 'POST':

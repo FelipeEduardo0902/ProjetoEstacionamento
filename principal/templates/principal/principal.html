@@ -1,166 +1,173 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Locadora - Painel Principal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8">
+    <title>Locadora - Painel Principal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap CSS + Ícones -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS + Ícones -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet">
 
-  <style>
-    .section-title {
-      margin-top: 40px;
-      border-left: 5px solid #0d6efd;
-      padding-left: 10px;
-      font-weight: 600;
-      font-size: 1.4rem;
-    }
-    .card-icon {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
+    <style>
+      .section-title {
+        margin-top: 40px;
+        border-left: 5px solid #0d6efd;
+        padding-left: 10px;
+        font-weight: 600;
+        font-size: 1.4rem;
+      }
+      .card-icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+      }
 
-    /* Botão piscante estilo natalino */
-    .blinking-button {
-      font-size: 1.5rem;
-      padding: 20px 40px;
-      animation: blink 1s infinite;
-      border-radius: 50px;
-      background: linear-gradient(45deg, red, green, gold);
-      color: white;
-      border: none;
-      text-shadow: 1px 1px 2px black;
-    }
+      /* Botão piscante estilo natalino */
+      .blinking-button {
+        font-size: 1.5rem;
+        padding: 20px 40px;
+        animation: blink 1s infinite;
+        border-radius: 50px;
+        background: linear-gradient(45deg, red, green, gold);
+        color: white;
+        border: none;
+        text-shadow: 1px 1px 2px black;
+      }
 
-    @keyframes blink {
-      0%   { opacity: 1; filter: hue-rotate(0deg); }
-      25%  { opacity: 0.8; filter: hue-rotate(60deg); }
-      50%  { opacity: 1; filter: hue-rotate(120deg); }
-      75%  { opacity: 0.8; filter: hue-rotate(180deg); }
-      100% { opacity: 1; filter: hue-rotate(360deg); }
-    }
-  </style>
-</head>
-<body class="bg-light">
+      @keyframes blink {
+        0%   { opacity: 1; filter: hue-rotate(0deg); }
+        25%  { opacity: 0.8; filter: hue-rotate(60deg); }
+        50%  { opacity: 1; filter: hue-rotate(120deg); }
+        75%  { opacity: 0.8; filter: hue-rotate(180deg); }
+        100% { opacity: 1; filter: hue-rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body class="bg-light">
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">Locadora</a>
-    </div>
-  </nav>
+    <nav class="navbar navbar-dark bg-primary">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="/">Locadora</a>
 
-  <!-- Botão destaque Entrega de Quarta -->
-  <div class="text-center my-4">
-    <a href="/reservas/entrega-quarta/" class="btn btn-lg fw-bold blinking-button shadow">
-      🎄 Entrega Especial de Quarta 🎄
-    </a>
-  </div>
+        <div>
+          {% if user.is_authenticated %}
+          <span class="text-white me-3">Olá, {{ user.username }}</span>
+          <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Sair</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-light btn-sm">Login</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
 
-  <div class="container py-4">
-    <h4 class="text-center">Painel Principal</h4>
+    <div class="container py-4">
+      <h4 class="text-center">Painel Principal</h4>
 
-    {% if messages %}
+      {% if messages %}
       <div class="alert alert-success text-center mt-3">
         {% for message in messages %}
-          <p>{{ message }}</p>
+        <p>{{ message }}</p>
         {% endfor %}
       </div>
-    {% endif %}
+      {% endif %}
 
-    <!-- Clientes -->
-    <h5 class="section-title text-primary">Clientes</h5>
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-user-plus text-success card-icon"></i>
-            <h6 class="mb-3">Cadastrar Cliente</h6>
-            <a href="/clientes/cadastrar/" class="btn btn-success">
-              <i class="fa fa-plus"></i> Acessar
-            </a>
+      <!-- Clientes -->
+      <h5 class="section-title text-primary">Clientes</h5>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i class="fa-solid fa-user-plus text-success card-icon"></i>
+              <h6 class="mb-3">Cadastrar Cliente</h6>
+              <a href="/clientes/cadastrar/" class="btn btn-success">
+                <i class="fa fa-plus"></i> Acessar
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i class="fa-solid fa-users text-info card-icon"></i>
+              <h6 class="mb-3">Gerenciar Clientes</h6>
+              <a href="/clientes/listar/" class="btn btn-info">
+                <i class="fa fa-list"></i> Acessar
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-users text-info card-icon"></i>
-            <h6 class="mb-3">Gerenciar Clientes</h6>
-            <a href="/clientes/listar/" class="btn btn-info">
-              <i class="fa fa-list"></i> Acessar
-            </a>
+      <!-- Veículos -->
+      <h5 class="section-title text-primary">Veículos</h5>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i class="fa-solid fa-car-side text-warning card-icon"></i>
+              <h6 class="mb-3">Cadastrar Veículo</h6>
+              <a href="/veiculos/cadastrar/" class="btn btn-warning">
+                <i class="fa fa-plus"></i> Acessar
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i class="fa-solid fa-eye text-primary card-icon"></i>
+              <h6 class="mb-3">Ver Veículos Disponíveis</h6>
+              <a href="/veiculos/consultar/" class="btn btn-primary">
+                <i class="fa fa-eye"></i> Acessar
+              </a>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Reservas -->
+      <h5 class="section-title text-primary">Reservas</h5>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i
+                class="fa-solid fa-calendar-check text-secondary card-icon"></i>
+              <h6 class="mb-3">Gerenciar Reservas</h6>
+              <a href="/reservas/listar/" class="btn btn-secondary">
+                <i class="fa fa-calendar-day"></i> Acessar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funcionários -->
+      <h5 class="section-title text-primary">Funcionários</h5>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100 text-center">
+            <div class="card-body">
+              <i class="fa-solid fa-user-gear text-dark card-icon"></i>
+              <h6 class="mb-3">Gerenciar Funcionários</h6>
+              <a href="/funcionarios/listar/" class="btn btn-dark">
+                <i class="fa fa-users-cog"></i> Acessar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Veículos -->
-    <h5 class="section-title text-primary">Veículos</h5>
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-car-side text-warning card-icon"></i>
-            <h6 class="mb-3">Cadastrar Veículo</h6>
-            <a href="/veiculos/cadastrar/" class="btn btn-warning">
-              <i class="fa fa-plus"></i> Acessar
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-eye text-primary card-icon"></i>
-            <h6 class="mb-3">Ver Veículos Disponíveis</h6>
-            <a href="/veiculos/consultar/" class="btn btn-primary">
-              <i class="fa fa-eye"></i> Acessar
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Reservas -->
-    <h5 class="section-title text-primary">Reservas</h5>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-calendar-check text-secondary card-icon"></i>
-            <h6 class="mb-3">Gerenciar Reservas</h6>
-            <a href="/reservas/listar/" class="btn btn-secondary">
-              <i class="fa fa-calendar-day"></i> Acessar
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Funcionários -->
-    <h5 class="section-title text-primary">Funcionários</h5>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card shadow-sm h-100 text-center">
-          <div class="card-body">
-            <i class="fa-solid fa-user-gear text-dark card-icon"></i>
-            <h6 class="mb-3">Gerenciar Funcionários</h6>
-            <a href="/funcionarios/listar/" class="btn btn-dark">
-              <i class="fa fa-users-cog"></i> Acessar
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

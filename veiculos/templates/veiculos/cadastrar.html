@@ -27,6 +27,21 @@
               </div>
 
               <div class="mb-3">
+                {{ form.marca.label_tag }}
+                {{ form.marca|add_class:"form-control" }}
+              </div>
+
+              <div class="mb-3">
+                {{ form.ano.label_tag }}
+                {{ form.ano|add_class:"form-control" }}
+              </div>
+
+              <div class="mb-3">
+                {{ form.cor.label_tag }}
+                {{ form.cor|add_class:"form-control" }}
+              </div>
+
+              <div class="mb-3">
                 {{ form.placa.label_tag }}
                 {{ form.placa|add_class:"form-control" }}
               </div>
@@ -42,8 +57,8 @@
               </div>
 
               <div class="form-check form-switch mb-3">
-                {{ form.status_disponibilidade }}
-                <label class="form-check-label">Disponível</label>
+                {{ form.status_disponibilidade|add_class:"form-check-input" }}
+                {{ form.status_disponibilidade.label_tag }}
               </div>
 
               <div class="mb-4">
