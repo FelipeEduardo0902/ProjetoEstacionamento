@@ -13,19 +13,17 @@ def cadastrar_funcionario(request):
         form = FuncionarioForm(request.POST)
         if form.is_valid():
             funcionario = form.save(commit=False)
+            username = funcionario.email  # E-mail como username
 
-            # Define o username como o e-mail do funcionário
-            username = funcionario.email
-
-            # Verifica se já existe usuário com o mesmo e-mail (username)
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'Já existe um usuário com esse e-mail.')
                 return render(request, 'usuarios/cadastrar_funcionario.html', {'form': form})
 
-            # Cria o usuário corretamente usando create_user
+            # Criação do usuário
             user = User.objects.create_user(
                 username=username,
-                password=form.cleaned_data['senha']
+                password=form.cleaned_data['senha'],
+                first_name=funcionario.nome  # Salva o nome no User para login alternativo
             )
 
             funcionario.user = user
@@ -37,6 +35,8 @@ def cadastrar_funcionario(request):
         form = FuncionarioForm()
 
     return render(request, 'usuarios/cadastrar_funcionario.html', {'form': form})
+
+
 @login_required
 def listar_funcionarios(request):
     funcionarios = Funcionario.objects.all()
@@ -45,15 +45,23 @@ def listar_funcionarios(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        login_input = request.POST.get('username')
         senha = request.POST.get('password')
-        user = authenticate(request, username=username, password=senha)
 
-        if user is not None:
-            login(request, user)
-            return redirect('home')  # redireciona para o painel principal
-        else:
-            messages.error(request, 'Usuário ou senha inválidos.')
+        # Primeiro tenta pelo e-mail (username)
+        user = User.objects.filter(username=login_input).first()
+
+        # Se não achou pelo e-mail, tenta pelo nome
+        if not user:
+            user = User.objects.filter(first_name=login_input).first()
+
+        if user:
+            auth_user = authenticate(request, username=user.username, password=senha)
+            if auth_user:
+                login(request, auth_user)
+                return redirect('home')
+        
+        messages.error(request, 'Usuário ou senha inválidos.')
 
     return render(request, 'usuarios/login.html')
 

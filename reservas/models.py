@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from clientes.models import Cliente
 from veiculos.models import Veiculo
 from usuarios.models import Funcionario
@@ -51,7 +52,13 @@ class Reserva(models.Model):
     def __str__(self):
         return f"{self.cliente.nome} - {self.veiculo.modelo}"
 
+    def clean(self):
+        if self.data_inicio and self.data_fim:
+            if self.data_fim < self.data_inicio:
+                raise ValidationError('A data de devolução não pode ser anterior à data de retirada.')
+
     def save(self, *args, **kwargs):
+        self.full_clean()  # Garante que a validação seja executada antes de salvar
         if self.data_inicio and self.data_fim and self.veiculo:
             dias = (self.data_fim - self.data_inicio).days
             if dias <= 0:

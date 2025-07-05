@@ -1,53 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Reserva
-from .forms import ReservaForm, RetiradaVeiculoForm, DevolucaoVeiculoForm
-from veiculos.models import Veiculo
-from usuarios.models import Funcionario
 from django.contrib import messages
-from django.urls import reverse
+from .models import Reserva, Veiculo
+from .forms import DevolucaoVeiculoForm, RetiradaVeiculoForm, ReservaForm
 from django.contrib.auth.decorators import login_required
-
-# View para reservar veículo
-@login_required
-def reservar_veiculo(request, veiculo_id):
-    veiculo = get_object_or_404(Veiculo, id=veiculo_id)
-
-    if request.method == 'POST':
-        form = ReservaForm(request.POST, veiculo=veiculo)
-        if form.is_valid():
-            reserva = form.save(commit=False)
-            reserva.veiculo = veiculo
-            reserva.funcionario = Funcionario.objects.first()  # substituir por funcionário logado futuramente
-
-            dias = (reserva.data_fim - reserva.data_inicio).days
-            if dias <= 0:
-                dias = 1
-            reserva.valor_total = dias * veiculo.preco_locacao
-
-            reserva.save()
-
-            veiculo.status_disponibilidade = False
-            veiculo.save()
-
-            messages.success(request, "Reserva criada com sucesso.")
-            return redirect('listar_reservas')
-    else:
-        form = ReservaForm(veiculo=veiculo)
-
-    return render(request, 'reservas/reservar.html', {
-        'veiculo': veiculo,
-        'form': form
-    })
+from django.urls import reverse
 
 
-# View para listar reservas
+# Listar reservas
 @login_required
 def listar_reservas(request):
     ordenar = request.GET.get('ordenar', 'data_inicio')
     reservas = Reserva.objects.select_related('cliente', 'veiculo').order_by(ordenar)
     return render(request, 'reservas/listar.html', {'reservas': reservas})
 
-# View para registrar retirada
+
+# Registrar retirada
 @login_required
 def registrar_retirada(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
@@ -74,7 +41,7 @@ def registrar_retirada(request, reserva_id):
     })
 
 
-# View para registrar devolução
+# Registrar devolução
 @login_required
 def registrar_devolucao_veiculo(request, reserva_id):
     reserva = get_object_or_404(Reserva, id=reserva_id)
@@ -82,30 +49,32 @@ def registrar_devolucao_veiculo(request, reserva_id):
     if request.method == 'POST':
         form = DevolucaoVeiculoForm(request.POST, instance=reserva)
         if form.is_valid():
-            devolucao = form.save(commit=False)
+            reserva = form.save(commit=False)
 
-            nivel_inicial = reserva.nivel_combustivel_inicial
-            nivel_final = devolucao.nivel_combustivel_final
-            ordem_combustivel = ['muito_baixo', 'baixo', 'meio', 'cheio']
+            ordem_combustivel = ['cheio', '3/4', 'meio', '1/4', 'quase_vazio', 'vazio']
+            nivel_inicial = (reserva.nivel_combustivel_inicial or '').strip()
+            nivel_final = (reserva.nivel_combustivel_final or '').strip()
+
+            if nivel_inicial not in ordem_combustivel or nivel_final not in ordem_combustivel:
+                messages.error(request, 'Nível de combustível inválido.')
+                return redirect('listar_reservas')
 
             if ordem_combustivel.index(nivel_final) < ordem_combustivel.index(nivel_inicial):
-                form.add_error('nivel_combustivel_final', 'O nível de combustível deve ser igual ou maior do que na retirada.')
-            else:
-                devolucao.status = 'finalizada'
-                devolucao.save()
-
-                reserva.veiculo.status_disponibilidade = True
-                reserva.veiculo.save()
-
-                messages.success(request, "Devolução registrada com sucesso.")
+                messages.error(request, 'O nível de combustível na devolução não pode ser maior do que na retirada.')
                 return redirect('listar_reservas')
+
+            reserva.status = 'finalizada'
+            reserva.veiculo.status_disponibilidade = 'disponivel'
+            reserva.veiculo.save()
+            reserva.save()
+
+            messages.success(request, 'Devolução registrada com sucesso.')
+            return redirect('listar_reservas')
     else:
         form = DevolucaoVeiculoForm(instance=reserva)
 
-    return render(request, 'reservas/registrar_devolucao_veiculo.html', {
-        'reserva': reserva,
-        'form': form
-    })
+    return render(request, 'reservas/registrar_devolucao_veiculo.html', {'reserva': reserva, 'form': form})
+
 
 # Relatório e busca
 @login_required
@@ -137,6 +106,7 @@ def entrega_quarta(request):
         'cliente_nome': cliente_nome,
     })
 
+
 # Editar reserva
 @login_required
 def editar_reserva(request, reserva_id):
@@ -156,6 +126,7 @@ def editar_reserva(request, reserva_id):
 
     return render(request, 'reservas/editar_reserva.html', {'form': form, 'reserva': reserva})
 
+
 # Excluir reserva
 @login_required
 def excluir_reserva(request, reserva_id):
@@ -165,3 +136,29 @@ def excluir_reserva(request, reserva_id):
         messages.success(request, 'Reserva excluída com sucesso.')
         return redirect('entrega_quarta')
     return render(request, 'reservas/excluir_reserva.html', {'reserva': reserva})
+
+
+# Reservar veículo
+@login_required
+def reservar_veiculo(request, veiculo_id):
+    veiculo = get_object_or_404(Veiculo, id=veiculo_id)
+
+    if request.method == 'POST':
+        form = ReservaForm(request.POST, veiculo=veiculo)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.veiculo = veiculo
+            reserva.funcionario = request.user.funcionario  # Supondo que o user esteja vinculado a um funcionário
+            dias = (reserva.data_fim - reserva.data_inicio).days or 1
+            reserva.valor_total = dias * veiculo.preco_locacao
+            reserva.save()
+
+            veiculo.status_disponibilidade = 'alugado'
+            veiculo.save()
+
+            messages.success(request, 'Reserva criada com sucesso.')
+            return redirect('listar_reservas')
+    else:
+        form = ReservaForm(veiculo=veiculo)
+
+    return render(request, 'reservas/reservar_veiculo.html', {'form': form, 'veiculo': veiculo})
