@@ -148,8 +148,15 @@ def reservar_veiculo(request, veiculo_id):
         if form.is_valid():
             reserva = form.save(commit=False)
             reserva.veiculo = veiculo
-            reserva.funcionario = request.user.funcionario  # Supondo que o user esteja vinculado a um funcionário
-            dias = (reserva.data_fim - reserva.data_inicio).days or 1
+
+            # Verifica se o usuário tem um funcionário vinculado
+            if hasattr(request.user, 'funcionario'):
+                reserva.funcionario = request.user.funcionario
+            else:
+                messages.error(request, 'Seu usuário não está vinculado a um funcionário. Fale com o administrador.')
+                return redirect('listar_reservas')
+
+            dias = (reserva.data_fim - reserva.data_inicio).days
             reserva.valor_total = dias * veiculo.preco_locacao
             reserva.save()
 
@@ -162,3 +169,4 @@ def reservar_veiculo(request, veiculo_id):
         form = ReservaForm(veiculo=veiculo)
 
     return render(request, 'reservas/reservar_veiculo.html', {'form': form, 'veiculo': veiculo})
+        

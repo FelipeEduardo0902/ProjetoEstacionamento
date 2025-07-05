@@ -57,8 +57,18 @@ class Reserva(models.Model):
             if self.data_fim < self.data_inicio:
                 raise ValidationError('A data de devolução não pode ser anterior à data de retirada.')
 
+            # Verifica conflitos de reserva para o mesmo veículo
+            conflitos = Reserva.objects.filter(
+                veiculo=self.veiculo,
+                data_inicio__lt=self.data_fim,
+                data_fim__gt=self.data_inicio
+            ).exclude(id=self.id).exclude(status='finalizada')
+
+            if conflitos.exists():
+                raise ValidationError('Este veículo já está reservado para o período informado.')
+
     def save(self, *args, **kwargs):
-        self.full_clean()  # Garante que a validação seja executada antes de salvar
+        self.full_clean()  # Validação antes de salvar
         if self.data_inicio and self.data_fim and self.veiculo:
             dias = (self.data_fim - self.data_inicio).days
             if dias <= 0:

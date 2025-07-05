@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def listar_veiculos_disponiveis(request):
-    veiculos = Veiculo.objects.all()
+    # Mostra apenas veículos disponíveis
+    veiculos = Veiculo.objects.filter(status_disponibilidade='disponivel')
     return render(request, 'veiculos/listar.html', {'veiculos': veiculos})
 
 
@@ -20,7 +21,7 @@ def cadastrar_veiculo(request):
             messages.success(request, 'Veículo cadastrado com sucesso!')
             return redirect('home')
         else:
-            print(form.errors)  # Mostra os erros no terminal
+            print(form.errors)  # Exibe erros no terminal
     else:
         form = VeiculoForm()
 
@@ -29,5 +30,6 @@ def cadastrar_veiculo(request):
 
 @login_required
 def entrega_quarta(request):
+    # Lista todos os veículos, independentemente do status
     veiculos = Veiculo.objects.all()
     return render(request, 'veiculos/entrega_quarta.html', {'veiculos': veiculos})
