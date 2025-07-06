@@ -124,6 +124,32 @@
                 </div>
             </div>
         </div>
+
+        <!--listar tarifas-->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-eye text-primary card-icon"></i>
+                    <h6 class="mb-3">Ver Tarifas de Veículos</h6>
+                    <a href="/veiculos/tarifas/" class="btn btn-primary">
+                        <i class="fa fa-eye"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!--manutenções-->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-wrench text-secondary card-icon"></i>
+                    <h6 class="mb-3">Manutenção</h6>
+                    <a href="{% url 'listar_manutencoes' %}" class="btn btn-primary">
+                        <i class="fa fa-eye"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Reservas -->
@@ -140,6 +166,20 @@
                 </div>
             </div>
         </div>
+
+        <!-- relatório de locações-->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <i class="fa-solid fa-file-lines text-secondary card-icon"></i>
+                    <h6 class="mb-3">Relatório de Locação</h6>
+                    <a href="/reservas/relatorio/" class="btn btn-secondary">
+                        <i class="fa fa-calendar-day"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Funcionários -->

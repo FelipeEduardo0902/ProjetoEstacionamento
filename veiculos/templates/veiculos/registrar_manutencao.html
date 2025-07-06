@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Manutenção</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap CSS + Ícones -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">Locadora</a>
+    </div>
+  </nav>
+
+<div class="container py-4">
+  <h4 class="text-center mb-4">Registrar Manutenção</h4>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="{{ form.veiculo.id_for_label }}" class="form-label">{{ form.veiculo.label }}</label>
+              {{ form.veiculo }}
+              {% if form.veiculo.errors %}
+                <div class="text-danger small">{{ form.veiculo.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.motivo.id_for_label }}" class="form-label">{{ form.motivo.label }}</label>
+              {{ form.motivo }}
+              {% if form.motivo.errors %}
+                <div class="text-danger small">{{ form.motivo.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.previsao_conclusao.id_for_label }}" class="form-label">{{ form.previsao_conclusao.label }}</label>
+              {{ form.previsao_conclusao }}
+              {% if form.previsao_conclusao.errors %}
+                <div class="text-danger small">{{ form.previsao_conclusao.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn btn-success">
+                <i class="fa fa-save"></i> Registrar
+              </button>
+              <a href="{% url 'listar_manutencoes' %}" class="btn btn-secondary ms-2">
+                <i class="fa fa-arrow-left"></i> Voltar
+              </a>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

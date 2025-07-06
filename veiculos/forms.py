@@ -1,5 +1,5 @@
 from django import forms
-from .models import Veiculo
+from .models import Veiculo, Manutencao
 
 
 class VeiculoForm(forms.ModelForm):
@@ -19,3 +19,18 @@ class VeiculoForm(forms.ModelForm):
         'preco_locacao': forms.NumberInput(attrs={'class': 'validate'}),
         'status_disponibilidade': forms.CheckboxInput(attrs={'class': 'filled-in'}),
 }
+
+class ManutencaoForm(forms.ModelForm):
+    class Meta:
+        model = Manutencao
+        fields = ['veiculo', 'motivo', 'previsao_conclusao']
+        widgets = {
+            'veiculo': forms.Select(attrs={'class': 'form-select'}),
+            'motivo': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'previsao_conclusao': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+        labels = {
+            'veiculo': 'Veículo',
+            'motivo': 'Motivo da Manutenção',
+            'previsao_conclusao': 'Previsão de Conclusão',
+        }
