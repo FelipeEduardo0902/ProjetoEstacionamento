@@ -28,3 +28,22 @@ class Veiculo(models.Model):
 
     def __str__(self):
         return f"{self.modelo} - {self.placa}"
+    
+class Manutencao(models.Model):
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.RESTRICT, related_name='manutencoes')
+    motivo = models.TextField()
+    data_inicio = models.DateField(auto_now_add=True)
+    previsao_conclusao = models.DateField()
+    concluida = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Atualiza o status do veículo automaticamente
+        if not self.concluida:
+            self.veiculo.status = 'Em manutenção'
+        else:
+            # Verifica se existem outras manutenções abertas
+            abertas = Manutencao.objects.filter(veiculo=self.veiculo, concluida=False).exclude(id=self.id).exists()
+            if not abertas:
+                self.veiculo.status = 'Disponível'
+        self.veiculo.save()

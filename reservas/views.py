@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Reserva, Veiculo
-from .forms import DevolucaoVeiculoForm, RetiradaVeiculoForm, ReservaForm
+from .forms import DevolucaoVeiculoForm, RetiradaVeiculoForm, ReservaForm, RelatorioReservaForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
@@ -170,3 +170,22 @@ def reservar_veiculo(request, veiculo_id):
 
     return render(request, 'reservas/reservar_veiculo.html', {'form': form, 'veiculo': veiculo})
         
+
+@login_required
+def gerar_relatorio(request):
+    form = RelatorioReservaForm(request.GET)
+    reservas = Reserva.objects.all()
+
+    if form.is_valid():
+        if form.cleaned_data['periodo_inicio']:
+            reservas = reservas.filter(data_retirada__gte=form.cleaned_data['periodo_inicio'])
+        if form.cleaned_data['periodo_fim']:
+            reservas = reservas.filter(data_retirada__lte=form.cleaned_data['periodo_fim'])
+        if form.cleaned_data['cliente']:
+            reservas = reservas.filter(cliente=form.cleaned_data['cliente'])
+        if form.cleaned_data['veiculo']:
+            reservas = reservas.filter(veiculo=form.cleaned_data['veiculo'])
+        if form.cleaned_data['status']:
+            reservas = reservas.filter(status=form.cleaned_data['status'])
+
+    return render(request, 'reservas/relatorio.html', {'form': form, 'reservas': reservas})

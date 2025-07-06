@@ -1,5 +1,5 @@
 from django import forms
-from .models import Reserva
+from .models import Reserva, Cliente, Veiculo
 from django.core.exceptions import ValidationError
 
 class ReservaForm(forms.ModelForm):
@@ -52,3 +52,15 @@ class DevolucaoVeiculoForm(forms.ModelForm):
             'nivel_combustivel_final': forms.Select(choices=Reserva.COMBUSTIVEL_CHOICES, attrs={'class': 'form-select'}),
             'observacoes_final': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
+class RelatorioReservaForm(forms.Form):
+    periodo_inicio = forms.DateField(required=False, label="Início do Período", widget=forms.DateInput(attrs={'type': 'date'}))
+    periodo_fim = forms.DateField(required=False, label="Fim do Período", widget=forms.DateInput(attrs={'type': 'date'}))
+    cliente = forms.ModelChoiceField(queryset=Cliente.objects.all(), required=False, label="Cliente")
+    veiculo = forms.ModelChoiceField(queryset=Veiculo.objects.all(), required=False, label="Veículo")
+    status = forms.ChoiceField(
+        choices=[('', 'Todos'), ('ativa', 'Ativa'), ('finalizada', 'Finalizada'), ('cancelada', 'Cancelada')],
+        required=False,
+        label="Status"
+    )
