@@ -53,11 +53,13 @@ class Reserva(models.Model):
         return f"{self.cliente.nome} - {self.veiculo.modelo}"
 
     def clean(self):
+        if not self.veiculo_id:
+            return  # ainda não foi vinculado, não valida
+
         if self.data_inicio and self.data_fim:
             if self.data_fim < self.data_inicio:
                 raise ValidationError('A data de devolução não pode ser anterior à data de retirada.')
 
-            # Verifica conflitos de reserva para o mesmo veículo
             conflitos = Reserva.objects.filter(
                 veiculo=self.veiculo,
                 data_inicio__lt=self.data_fim,
